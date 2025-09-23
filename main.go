@@ -1,12 +1,35 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"strings"
 )
 
 func main () {
-	fmt.Println("Hello, World!")
+	inputScanner := bufio.NewScanner(os.Stdin)
+
+	for {
+		fmt.Print("Pokedex > ")
+		if !inputScanner.Scan() {
+			if err := inputScanner.Err(); err != nil {
+				fmt.Println("Error reading input:", err)
+			}
+			break
+		}
+
+		userInput := inputScanner.Text()
+		cleanedInput := cleanInput(userInput)
+
+		if len(cleanedInput) == 0 {
+			continue
+		}
+
+		command := cleanedInput[0]
+		
+		fmt.Printf("Your command was: %s\n", command)
+	}
 }
 
 func cleanInput(text string) []string {
