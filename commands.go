@@ -36,6 +36,11 @@ func commandMap(conf *Config) error {
 	url := "https://pokeapi.co/api/v2/location-area/"
 	if conf.Next != "" {
 		url = conf.Next
+	} else if conf.Next == "" && conf.Previous != "" {
+		fmt.Println("No more pages, returning to the first page.")
+		conf.Next = ""
+		conf.Previous = ""
+		return nil
 	}
 
 	res, err := http.Get(url)
@@ -65,6 +70,11 @@ func commandPreviousMap(conf *Config) error {
 
 	if conf.Previous != "" {
 		url = conf.Previous
+	} else if conf.Previous == "" && conf.Next == "" {
+		fmt.Println("No more pages, returning to the first page.")
+		conf.Next = ""
+		conf.Previous = ""
+		return nil
 	}
 
 	res, err := http.Get(url)
