@@ -1,8 +1,8 @@
-package main
+package cli
 
 import "strings"
 
-func cleanInput(text string) []string {
+func CleanInput(text string) []string {
 	// split the input text into a slice of words
 	words := strings.Fields(text)
 

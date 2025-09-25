@@ -1,7 +1,9 @@
-package main
+package cli_test
 
 import (
 	"testing"
+
+	"github.com/kn1ghtm0nster/go-pokedex/internal/cli"
 )
 
 func TestCleanInput(t *testing.T) {
@@ -32,7 +34,7 @@ func TestCleanInput(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		actual := cleanInput(c.input)
+		actual := cli.CleanInput(c.input)
 		// Check the length of the actual slice against the expected slice
 		// if they don't match, use t.Errorf to print an error message
 		// and fail the test

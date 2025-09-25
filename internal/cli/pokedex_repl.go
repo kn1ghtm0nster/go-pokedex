@@ -1,4 +1,4 @@
-package main
+package cli
 
 import (
 	"bufio"
@@ -6,9 +6,6 @@ import (
 	"os"
 )
 
-// NOTE: to prevent initialization issues, we declare supportedCommands here
-// and initialize it in main.go
-var supportedCommands map[string]cliCommand
 
 func PokedexREPL() {
 	inputScanner := bufio.NewScanner(os.Stdin)
@@ -28,7 +25,7 @@ func PokedexREPL() {
 		}
 
 		userInput := inputScanner.Text()
-		cleanedInput := cleanInput(userInput)
+		cleanedInput := CleanInput(userInput)
 
 		if len(cleanedInput) == 0 {
 			continue

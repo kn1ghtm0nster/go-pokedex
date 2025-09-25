@@ -1,11 +1,15 @@
-package main
+package cli
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
+
+	"github.com/kn1ghtm0nster/go-pokedex/internal/pokeapi"
 )
+
+var supportedCommands map[string]cliCommand
 
 func commandExit(conf *Config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
@@ -43,7 +47,7 @@ func commandMap(conf *Config) error {
 	}
 	defer res.Body.Close()
 
-	data := PokeAPILocationAreaResponse{}
+	data := pokeapi.PokeAPILocationAreaResponse{}
 	decoder := json.NewDecoder(res.Body)
 	if err := decoder.Decode(&data); err != nil {
 		return err
@@ -78,7 +82,7 @@ func commandPreviousMap(conf *Config) error {
 
 	defer res.Body.Close()
 
-	data := PokeAPILocationAreaResponse{}
+	data := pokeapi.PokeAPILocationAreaResponse{}
 	decoder := json.NewDecoder(res.Body)
 	if err := decoder.Decode(&data); err != nil {
 		return err
@@ -92,4 +96,29 @@ func commandPreviousMap(conf *Config) error {
 	conf.Previous = data.Previous
 
 	return nil
+}
+
+func init() {
+	supportedCommands = map[string]cliCommand{
+	"exit": {
+		name: "exit",
+		description: "Exit the Pokedex",
+		callback: commandExit,
+	},
+	"help": {
+		name: "help",
+		description: "Displays a help message",
+		callback: commandHelp,
+	},
+	"map": {
+		name: "map",
+		description: "Displays the names of 20 location areas in the Pokemon world. Can be used again to show the next 20 location area names.",
+		callback: commandMap,
+	},
+	"mapb": {
+		name: "mapb",
+		description: "Displays the names of the previous 20 location areas in the Pokemon world. Can be used again to show the previous 20 location area names.",
+		callback: commandPreviousMap,
+	},
+}
 }

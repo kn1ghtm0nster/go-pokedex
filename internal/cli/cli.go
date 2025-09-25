@@ -1,4 +1,5 @@
-package main
+package cli
+
 
 type cliCommand struct {
 	name        string
@@ -10,3 +11,4 @@ type Config struct {
 	Next     string
 	Previous string
 }
+
