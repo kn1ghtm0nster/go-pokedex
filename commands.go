@@ -59,3 +59,33 @@ func commandMap(conf *Config) error {
 
 	return nil
 }
+
+func commandPreviousMap(conf *Config) error {
+	url := "https://pokeapi.co/api/v2/location-area/"
+
+	if conf.Previous != "" {
+		url = conf.Previous
+	}
+
+	res, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+
+	defer res.Body.Close()
+
+	data := PokeAPILocationAreaResponse{}
+	decoder := json.NewDecoder(res.Body)
+	if err := decoder.Decode(&data); err != nil {
+		return err
+	}
+
+	for _, location := range data.Results {
+		fmt.Println(location.Name)
+	}
+
+	conf.Next = data.Next
+	conf.Previous = data.Previous
+
+	return nil
+}

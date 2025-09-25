@@ -27,8 +27,13 @@ func PokedexREPL() {
 		},
 		"map": {
 			name: "map",
-			description: "Displays the names of 20 location areas in the Pokemon world. Can be called with next and previous to paginate.",
+			description: "Displays the names of 20 location areas in the Pokemon world. Can be used again to show the next 20 location area names.",
 			callback: commandMap,
+		},
+		"mapb": {
+			name: "mapb",
+			description: "Displays the names of the previous 20 location areas in the Pokemon world. Can be used again to show the previous 20 location area names.",
+			callback: commandPreviousMap,
 		},
 	}
 
