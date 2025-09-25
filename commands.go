@@ -19,14 +19,8 @@ func commandHelp(conf *Config) error {
 	fmt.Println("Usage:")
 	fmt.Println()
 
-	commands := []string{"exit", "help"}
-	descriptions := []string{
-		"Exit the Pokedex",
-		"Displays a help message",
-	}
-
-	for i, cmd := range commands {
-		fmt.Printf("%s: %s\n", cmd, descriptions[i])
+	for _, cmd := range supportedCommands {
+		fmt.Printf("%s: %s\n", cmd.name, cmd.description)
 	}
 
 	return nil
