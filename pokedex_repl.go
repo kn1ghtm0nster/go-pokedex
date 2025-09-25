@@ -9,6 +9,11 @@ import (
 func PokedexREPL() {
 	inputScanner := bufio.NewScanner(os.Stdin)
 
+	config := Config{
+		Next:     "",
+		Previous: "",
+	}
+
 	supportedCommands := map[string]cliCommand{
 		"exit": {
 			name: "exit",
@@ -19,6 +24,11 @@ func PokedexREPL() {
 			name: "help",
 			description: "Displays a help message",
 			callback: commandHelp,
+		},
+		"map": {
+			name: "map",
+			description: "Displays the names of 20 location areas in the Pokemon world. Can be called with next and previous to paginate.",
+			callback: commandMap,
 		},
 	}
 
@@ -41,7 +51,7 @@ func PokedexREPL() {
 		command := cleanedInput[0]
 
 		if cmd, exists := supportedCommands[command]; exists {
-			cmd.callback()
+			cmd.callback(&config)
 		} else {
 			fmt.Println("Unknown command")
 		}
