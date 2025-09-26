@@ -41,6 +41,20 @@ func commandMap(conf *Config) error {
 		return nil
 	}
 
+	info, exists := conf.Cache.Get(url)
+	if exists {
+		serializedInfo := pokeapi.PokeAPILocationAreaResponse{}
+		if err := json.Unmarshal(info, &serializedInfo); err != nil {
+			fmt.Println("Error unmarshalling cached data:", err)
+		}
+
+		fmt.Println("[INFO] - Cached data found. Using existing data.")
+		for _, location := range serializedInfo.Results {
+			fmt.Println(location.Name)
+		}
+		return nil
+	}
+
 	res, err := http.Get(url)
 	if err != nil {
 		return err
@@ -57,6 +71,13 @@ func commandMap(conf *Config) error {
 		fmt.Println(location.Name)
 	}
 
+	byteData, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println("Error marshalling data for cache:", err)
+		return nil
+	}
+	conf.Cache.Add(url, byteData)
+
 	conf.Next = data.Next
 	conf.Previous = data.Previous
 
@@ -72,6 +93,20 @@ func commandPreviousMap(conf *Config) error {
 		fmt.Println("No more pages, returning to the first page.")
 		conf.Next = ""
 		conf.Previous = ""
+		return nil
+	}
+
+	info, exists := conf.Cache.Get(url)
+	if exists {
+		serializedInfo := pokeapi.PokeAPILocationAreaResponse{}
+		if err := json.Unmarshal(info, &serializedInfo); err != nil {
+			fmt.Println("Error unmarshalling cached data:", err)
+		}
+
+		fmt.Println("[INFO] - Cached data found. Using existing data.")
+		for _, location := range serializedInfo.Results {
+			fmt.Println(location.Name)
+		}
 		return nil
 	}
 
@@ -92,6 +127,13 @@ func commandPreviousMap(conf *Config) error {
 		fmt.Println(location.Name)
 	}
 
+	byteData, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println("Error marshalling data for cache:", err)
+		return nil
+	}
+	conf.Cache.Add(url, byteData)
+
 	conf.Next = data.Next
 	conf.Previous = data.Previous
 
@@ -100,25 +142,25 @@ func commandPreviousMap(conf *Config) error {
 
 func init() {
 	supportedCommands = map[string]cliCommand{
-	"exit": {
-		name: "exit",
-		description: "Exit the Pokedex",
-		callback: commandExit,
-	},
-	"help": {
-		name: "help",
-		description: "Displays a help message",
-		callback: commandHelp,
-	},
-	"map": {
-		name: "map",
-		description: "Displays the names of 20 location areas in the Pokemon world. Can be used again to show the next 20 location area names.",
-		callback: commandMap,
-	},
-	"mapb": {
-		name: "mapb",
-		description: "Displays the names of the previous 20 location areas in the Pokemon world. Can be used again to show the previous 20 location area names.",
-		callback: commandPreviousMap,
-	},
-}
+		"exit": {
+			name: "exit",
+			description: "Exit the Pokedex",
+			callback: commandExit,
+		},
+		"help": {
+			name: "help",
+			description: "Displays a help message",
+			callback: commandHelp,
+		},
+		"map": {
+			name: "map",
+			description: "Displays the names of 20 location areas in the Pokemon world. Can be used again to show the next 20 location area names.",
+			callback: commandMap,
+		},
+		"mapb": {
+			name: "mapb",
+			description: "Displays the names of the previous 20 location areas in the Pokemon world. Can be used again to show the previous 20 location area names.",
+			callback: commandPreviousMap,
+		},
+	}
 }

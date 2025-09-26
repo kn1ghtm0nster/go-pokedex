@@ -4,6 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"time"
+
+	"github.com/kn1ghtm0nster/go-pokedex/internal/pokecache"
 )
 
 
@@ -13,6 +16,7 @@ func PokedexREPL() {
 	config := Config{
 		Next:     "",
 		Previous: "",
+		Cache: pokecache.NewCache(5 * time.Second),
 	}
 
 	for {

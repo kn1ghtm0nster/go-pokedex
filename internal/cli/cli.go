@@ -1,5 +1,8 @@
 package cli
 
+import (
+	"github.com/kn1ghtm0nster/go-pokedex/internal/pokecache"
+)
 
 type cliCommand struct {
 	name        string
@@ -10,5 +13,6 @@ type cliCommand struct {
 type Config struct {
 	Next     string
 	Previous string
+	Cache    *pokecache.Cache
 }
 
