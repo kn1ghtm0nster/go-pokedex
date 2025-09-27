@@ -11,13 +11,13 @@ import (
 
 var supportedCommands map[string]cliCommand
 
-func commandExit(conf *Config) error {
+func commandExit(conf *Config, args []string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(conf *Config) error {
+func commandHelp(conf *Config, args []string) error {
 	fmt.Println("Welcome to the Pokedex!")
 
 	fmt.Println("Usage:")
@@ -30,7 +30,7 @@ func commandHelp(conf *Config) error {
 	return nil
 }
 
-func commandMap(conf *Config) error {
+func commandMap(conf *Config, args []string) error {
 	url := "https://pokeapi.co/api/v2/location-area/"
 	if conf.Next != "" {
 		url = conf.Next
@@ -84,7 +84,7 @@ func commandMap(conf *Config) error {
 	return nil
 }
 
-func commandPreviousMap(conf *Config) error {
+func commandPreviousMap(conf *Config, args []string) error {
 	url := "https://pokeapi.co/api/v2/location-area/"
 
 	if conf.Previous != "" {
@@ -140,6 +140,67 @@ func commandPreviousMap(conf *Config) error {
 	return nil
 }
 
+func commandExplore(conf *Config, args []string) error {
+	if len(args) == 0 {
+		fmt.Println("Please provide a location area name. Usage: explore <location-area-name>")
+		return nil
+	}
+	locationName := args[0]
+	url := fmt.Sprintf("https://pokeapi.co/api/v2/location-area/%s", locationName)
+
+	info, exists := conf.Cache.Get(url)
+	if exists {
+		serializedInfo := pokeapi.PokeAPILocationAreaDetail{}
+		if err := json.Unmarshal(info, &serializedInfo); err != nil {
+			fmt.Println("Error unmarshalling cached data:", err)
+			return nil
+		}
+
+		fmt.Println("[INFO] - Cached data found. Using existing data.")
+		fmt.Println()
+		fmt.Println("Exploring", locationName, "...")
+		fmt.Println("Found Pokemon:")
+		for _, encounter := range serializedInfo.PokemonEncounters {
+			fmt.Println(" -", encounter.Pokemon.Name)
+		}
+		return nil
+	}
+
+	res, err := http.Get(url)
+	if err != nil {
+		fmt.Println("Error fetching data from PokeAPI:", err)
+		return nil
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		fmt.Printf("Error: Received status code %d from PokeAPI. Please check the location area name.\n", res.StatusCode)
+		return nil
+	}
+
+	data := pokeapi.PokeAPILocationAreaDetail{}
+	decoder := json.NewDecoder(res.Body)
+	if err := decoder.Decode(&data); err != nil {
+		fmt.Println("Error decoding response from PokeAPI:", err)
+		return nil
+	}
+	
+	fmt.Println("Exploring", locationName, "...")
+	fmt.Println("Found Pokemon:")
+	for _, encounter := range data.PokemonEncounters {
+		fmt.Println(" -", encounter.Pokemon.Name)
+	}
+
+	byteData, err := json.Marshal(data)
+	if err != nil {
+		fmt.Println("Error marshalling data for cache:", err)
+		return nil
+	}
+	conf.Cache.Add(url, byteData)
+
+	return nil
+}
+
 func init() {
 	supportedCommands = map[string]cliCommand{
 		"exit": {
@@ -161,6 +222,11 @@ func init() {
 			name: "mapb",
 			description: "Displays the names of the previous 20 location areas in the Pokemon world. Can be used again to show the previous 20 location area names.",
 			callback: commandPreviousMap,
+		},
+		"explore": {
+			name: "explore",
+			description: "Displays pokemon in a specific location area.",
+			callback: commandExplore,
 		},
 	}
 }

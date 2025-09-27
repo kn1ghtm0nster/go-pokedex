@@ -36,9 +36,10 @@ func PokedexREPL() {
 		}
 
 		command := cleanedInput[0]
+		args := cleanedInput[1:]
 
 		if cmd, exists := supportedCommands[command]; exists {
-			cmd.callback(&config)
+			cmd.callback(&config, args)
 		} else {
 			fmt.Println("Unknown command")
 		}
