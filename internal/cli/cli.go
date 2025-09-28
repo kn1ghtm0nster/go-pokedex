@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"github.com/kn1ghtm0nster/go-pokedex/internal/pokeapi"
 	"github.com/kn1ghtm0nster/go-pokedex/internal/pokecache"
 )
 
@@ -14,5 +15,6 @@ type Config struct {
 	Next     string
 	Previous string
 	Cache    *pokecache.Cache
+	Caught   map[string]pokeapi.PokemonDetail
 }
 

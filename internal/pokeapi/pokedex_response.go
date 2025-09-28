@@ -26,3 +26,9 @@ type PokeAPILocationAreaPokemonDetail struct {
 	Name string `json:"name"`
 	URL  string `json:"url"`
 }
+
+type PokemonDetail struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	BaseExperience int `json:"base_experience"`
+}

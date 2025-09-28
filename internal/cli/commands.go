@@ -3,8 +3,11 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"os"
+	"strings"
+	"time"
 
 	"github.com/kn1ghtm0nster/go-pokedex/internal/pokeapi"
 )
@@ -201,6 +204,55 @@ func commandExplore(conf *Config, args []string) error {
 	return nil
 }
 
+func commandCatch(conf *Config, args []string) error {
+	if len(args) == 0 {
+		fmt.Println("Please provide a pokemon name. Usage: catch <pokemon-name>")
+		return nil
+	}
+	pokemonName := strings.ToLower(args[0])
+
+	_, alreadyCaught := conf.Caught[pokemonName]
+	if alreadyCaught {
+		fmt.Printf("You have already caught %s!\n", pokemonName)
+		return nil
+	}
+
+	url := fmt.Sprintf("https://pokeapi.co/api/v2/pokemon/%s", pokemonName)
+
+	res, err := http.Get(url)
+	if err != nil {
+		fmt.Println("Error fetching data from PokeAPI:", err)
+		return nil
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		fmt.Printf("Error: Received status code %d from PokeAPI. Please check the pokemon name.\n", res.StatusCode)
+		return nil
+	}
+
+	pokemonDetail := pokeapi.PokemonDetail{}
+	decoder := json.NewDecoder(res.Body)
+	if err := decoder.Decode(&pokemonDetail); err != nil {
+		fmt.Println("Error decoding response from PokeAPI:", err)
+		return nil
+	}
+
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokemonName)
+	time.Sleep(2 * time.Second)
+
+	playerLuck := rand.Intn(351)
+
+	if playerLuck > pokemonDetail.BaseExperience {
+		fmt.Printf("%s was caught!\n", pokemonName)
+		conf.Caught[pokemonName] = pokemonDetail
+		return nil
+	} else {
+		fmt.Printf("%s escaped!\n", pokemonName)
+		return nil
+	}
+}
+
 func init() {
 	supportedCommands = map[string]cliCommand{
 		"exit": {
@@ -227,6 +279,11 @@ func init() {
 			name: "explore",
 			description: "Displays pokemon in a specific location area.",
 			callback: commandExplore,
+		},
+		"catch": {
+			name: "catch",
+			description: "Simulates catching a specific pokemon.",
+			callback: commandCatch,
 		},
 	}
 }
