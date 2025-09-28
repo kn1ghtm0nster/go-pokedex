@@ -245,6 +245,7 @@ func commandCatch(conf *Config, args []string) error {
 
 	if playerLuck > pokemonDetail.BaseExperience {
 		fmt.Printf("%s was caught!\n", pokemonName)
+		fmt.Println("You may now inspect it with the inspect command.")
 		conf.Caught[pokemonName] = pokemonDetail
 		return nil
 	} else {
@@ -285,6 +286,21 @@ func commandInspect(conf *Config, args []string) error {
 	return nil
 }
 
+func commandPokedex(conf *Config, args []string) error {
+	if len(conf.Caught) == 0 {
+		fmt.Println("You have not caught any pokemon yet.")
+		return nil
+	}
+
+	fmt.Println("Your Pokedex:")
+	for pokemon := range conf.Caught {
+		fmt.Println(" -", pokemon)
+	}
+
+	return nil
+}
+
+
 func init() {
 	supportedCommands = map[string]cliCommand{
 		"exit": {
@@ -321,6 +337,11 @@ func init() {
 			name: "inspect",
 			description: "Displays detailed information about a specific caught pokemon.",
 			callback: commandInspect,
+		},
+		"pokedex": {
+			name: "pokedex",
+			description: "Displays the names of all caught pokemon.",
+			callback: commandPokedex,
 		},
 	}
 }
