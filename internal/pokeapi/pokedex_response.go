@@ -30,5 +30,22 @@ type PokeAPILocationAreaPokemonDetail struct {
 type PokemonDetail struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
+	Height int `json:"height"`
+	Weight int `json:"weight"`
+	Stats []struct {
+		BaseStat int         `json:"base_stat"`
+		Stat     PokemonStat `json:"stat"`
+	} `json:"stats"`
+	Types []struct {
+		Type PokemonType `json:"type"`
+	} `json:"types"`
 	BaseExperience int `json:"base_experience"`
+}
+
+type PokemonStat struct {
+	Name string `json:"name"`
+}
+
+type PokemonType struct {
+	Name string `json:"name"`
 }

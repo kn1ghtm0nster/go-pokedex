@@ -253,6 +253,38 @@ func commandCatch(conf *Config, args []string) error {
 	}
 }
 
+func commandInspect(conf *Config, args []string) error {
+	if len(args) == 0 {
+		fmt.Println("Please provide a pokemon name. Usage: inspect <pokemon-name>")
+		return nil
+	}
+
+	pokemonName := strings.ToLower(args[0])
+	pokemonDetail, exists := conf.Caught[pokemonName]
+	if !exists {
+		fmt.Println("you have not caught that pokemon")
+		return nil
+	}
+
+	var sb strings.Builder
+	fmt.Fprintf(&sb, "Name: %s\n", pokemonDetail.Name)
+	fmt.Fprintf(&sb, "Height: %d\n", pokemonDetail.Height)
+	fmt.Fprintf(&sb, "Weight: %d\n", pokemonDetail.Weight)
+
+	fmt.Fprintf(&sb, "Stats:\n")
+	for _, stat := range pokemonDetail.Stats {
+		fmt.Fprintf(&sb, "  -%s: %d\n", stat.Stat.Name, stat.BaseStat)
+	}
+
+	fmt.Fprintf(&sb, "Types:\n")
+	for _, t := range pokemonDetail.Types {
+		fmt.Fprintf(&sb, "  -%s\n", t.Type.Name)
+	}
+
+	fmt.Print(sb.String())
+	return nil
+}
+
 func init() {
 	supportedCommands = map[string]cliCommand{
 		"exit": {
@@ -284,6 +316,11 @@ func init() {
 			name: "catch",
 			description: "Simulates catching a specific pokemon.",
 			callback: commandCatch,
+		},
+		"inspect": {
+			name: "inspect",
+			description: "Displays detailed information about a specific caught pokemon.",
+			callback: commandInspect,
 		},
 	}
 }
